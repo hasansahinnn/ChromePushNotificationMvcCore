@@ -1,0 +1,39 @@
+ public JsonResult setNotifyToken(string token)
+        {
+            if (!String.IsNullOrEmpty(token))
+            {
+                User user = GetUser();
+                NotifyTokens notify = dbcontext.NotifyTokens.FirstOrDefault(x => x.Token == token);
+                if (notify != null)
+                    if (notify.UserId != 0 && user == null)
+                        return Json("");
+                if (notify == null)
+                {
+                    Random rnd = new Random();
+                    int randomid = rnd.Next(1000000, 9999999);
+                    while (dbcontext.NotifyTokens.FirstOrDefault(x => x.UserId == randomid) != null)
+                        randomid = rnd.Next(1000000, 9999999);
+
+                    NotifyTokens newnotify = new NotifyTokens()
+                    {
+                        IDate = DateTime.Now,
+                        LastDate = DateTime.Now,
+                        Token = token,
+                        UserId = user != null ? user.Id : randomid,
+                        userType = user == null ? 0 : user.UserDetail != null ? 1 : 2
+                    };
+                    dbcontext.NotifyTokens.Add(newnotify);
+                }
+                else
+                {
+                    notify.LastDate = DateTime.Now;
+                    if (user != null)
+                    {
+                        notify.UserId = user.Id;
+                        notify.userType = user == null ? 0 : user.UserDetail != null ? 1 : 2; //If User Login, Change ID
+                    }
+                }
+                dbcontext.SaveChanges();
+            }
+            return Json("");
+        }

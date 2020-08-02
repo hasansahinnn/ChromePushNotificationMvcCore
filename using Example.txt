@@ -1,0 +1,4 @@
+        var response =  sendNotify.SendNotificationAsync(new NotificationPostData() {
+                        FcmTokens= dbcontext.NotifyTokens.Where(x => x.UserId == user.Id).Select(x => x.Token).ToList(),
+                        MessageData= new NotificationMessageData() {Title="Welcome",Message="Your Message",Link="",Action="", Image = "logo"}
+                   });
